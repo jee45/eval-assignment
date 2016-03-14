@@ -57,6 +57,8 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
         // TODO Implement the entropy metric
 
+
+
         //what the hell is the entropy metric?
         // record the entropy in the context for aggregation
         context.addUser(entropy);
