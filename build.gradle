@@ -1,0 +1,150 @@
+/* This file may be freely modified, used, and redistributed without restriction. */
+/* Set up the repositories to get the LensKit plugin.
+ * This configuration pulls in things needed for the build.gradle script itself */
+buildscript {
+    repositories {
+        // LensKit snapshots are published to the Sonatype snapshot repository
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+        // LensKit releases are published to Maven Central
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.grouplens.lenskit:lenskit-gradle:3.0-T4'
+    }
+}
+
+apply plugin: 'java' // if you use Groovy or Scala, add those plugins
+apply plugin: 'lenskit'
+
+/* Set up the repositories for getting LensKit and other libraries.
+ * These repositories are used for your Java or Groovy code, and for running LensKit.
+ */
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    // Code needs to build with LensKit.
+    compile "org.grouplens.lenskit:lenskit-all:3.0-T4"
+    compile "org.apache.lucene:lucene-analyzers:3.5.0"
+    compile "org.apache.lucene:lucene-queries:3.5.0"
+    
+    // To run the code, we also need the LensKit CLI.
+    runtime "org.grouplens.lenskit:lenskit-cli:3.0-T4"
+
+    // Tests use JUnit
+    testCompile "junit:junit:4.12"
+}
+
+/* Configure LensKit */
+lenskit {
+    // you can configure the threadCount and maxMemory here, or on the command line
+    // e.g. -PthreadCount=8
+}
+
+import org.lenskit.gradle.*
+
+task crossfold(type: Crossfold, group: 'evaluate') {
+    // download data before evaluating
+
+    input textFile {
+        file "data/ratings.csv"
+        delimiter ","
+        // ratings are on a 1-5 scale
+        domain {
+            minimum 0.5
+            maximum 5.0
+            precision 0.5
+        }
+    }
+    // test on 5 random ratings for each user
+    userPartitionMethod holdout(5, 'random')
+    // use 5-fold cross-validation
+    partitionCount 5
+    // pack data for efficiency
+    outputFormat 'PACK'
+}
+
+/* Run the LensKit evaluation */
+task evaluate(type: TrainTest, group: 'evaluate') {
+    description 'Runs the LensKit evaluation.'
+
+    // we add our crossfold task as evaluation input
+    dataSet crossfold
+
+    // send the output to appropriate files
+    outputFile "build/eval-results.csv"
+    userOutputFile "build/eval-users.csv"
+
+    // configure our algorithms
+    algorithm 'cfg/baselines.groovy'
+
+    // and some evaluation tasks and metrics
+    predict {
+        metric 'coverage'
+        metric 'rmse'
+        metric 'ndcg'
+    }
+    recommend {
+        listSize 10
+        candidateItems "allItems"
+        excludeItems "user.trainItems"
+        metric 'ndcg'
+        metric('mrr') {
+            goodItems 'user.trainItems'
+        }
+        metric('map') {
+            goodItems 'user.trainItems'
+        }
+    }
+    recommend {
+        listSize 10
+        candidateItems "recommender.get(edu.umn.cs.recsys.dao.ItemTagDAO).taggedItems"
+        excludeItems "user.trainItems"
+        metric 'edu.umn.cs.recsys.TagEntropyMetric'
+    }
+}
+
+task analyzeResults(type: Exec, group: 'evaluate') {
+    description 'Post-processes evaluation results to draw charts.'
+
+    dependsOn evaluate
+
+    inputs.files "build/eval-results.csv", "analyze-output.ipynb"
+    outputs.file "build/analysis.html"
+
+    /* run Jupyter/IPython. Location can be overridden with -Pipython.bin=/usr/bin/ipython */
+    if (project.hasProperty('ipython.bin')) {
+        executable project.getProperty('ipython.bin')
+    } else {
+        executable 'jupyter'
+    }
+    args 'nbconvert', '--to', 'html', '--execute'
+    args '--output', file("build/analysis.html")
+    args file("analyze-results.ipynb")
+}
+
+task debug {
+    doLast {
+        println(evaluate.class)
+        println('inputs:')
+        for (inf in evaluate.inputs.files) {
+            println('  ' + inf)
+        }
+        println('outputs:')
+        for (outf in evaluate.outputs.files.files) {
+            println('  ' + outf)
+        }
+    }
+}
+
+
+
+
+
+

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.grouplens.lenskit:lenskit-eval:3.0-T4">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.grouplens.lenskit/lenskit-eval/3.0-T4/7ee5207bda5d2ce291d6f5c4f9050fff9452e2de/lenskit-eval-3.0-T4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.grouplens.lenskit/lenskit-eval/3.0-T4/795ea80f6b52ccc181d099261f04acc256efe380/lenskit-eval-3.0-T4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
