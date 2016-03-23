@@ -59,28 +59,30 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
         // TODO Implement the entropy metric
 
         // record the entropy in the context for aggregation
-
         //make a list for tag probabilities
+
 
         //runningProbabilityTotalForTHisTag
 
         //for each movie in the recommendations list
         for (Result movie: recommendations) {
+
             //runningProbabilityTotalForTHisTag = 0
 
             //get the list of tags for this movie
 
              //for each tag in the tag list
-                //if the tag is in the list for tag probailities,
-                    //runningProbabilityTotalForTHisTag is the stored probablity  for this tag
 
-                //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1(IfThisTagIsInTheListForThisMovie)/totalTagCountForThisMovie))
+                //if the tag is in the list for tag probailities,
+                    //runningProbabilityTotalForTHisTag = the stored probablity  for this tag
+
+                //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
                 //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
 
         }
 
         //for each tag in the list for tag probabilities
-            //runningProbabilityTotalForTHisTag is the stored probablity for this tag
+            //runningProbabilityTotalForTHisTag = the stored probablity for this tag
             //entropy += (runningProbabilityTotalForTHisTag)* log(runningProbabilityTotalForTHisTag)
 
         context.addUser(entropy);
