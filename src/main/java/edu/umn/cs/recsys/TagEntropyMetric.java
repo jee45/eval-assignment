@@ -72,7 +72,7 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
              //for each tag in the tag list
                 //if the tag is in the list for tag probailities,
-                    //runningProbabilityTotalForTHisTag is stored probablity
+                    //runningProbabilityTotalForTHisTag is the stored probablity  for this tag
 
                 //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1(IfThisTagIsInTheListForThisMovie)/totalTagCountForThisMovie))
                 //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
@@ -80,7 +80,8 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
         }
 
         //for each tag in the list for tag probabilities
-            //entropy += eachTagProbabiltiy from list for tag probabilities
+            //runningProbabilityTotalForTHisTag is the stored probablity for this tag
+            //entropy += (runningProbabilityTotalForTHisTag)* log(runningProbabilityTotalForTHisTag)
 
         context.addUser(entropy);
 
