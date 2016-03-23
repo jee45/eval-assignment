@@ -61,11 +61,11 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
         // record the entropy in the context for aggregation
 
         //make a list for tag probabilities
-        Long2DoubleMap tagProbabilities = null;
+        Long2DoubleMap tagProbabilitiesList = new Long2DoubleOpenHashMap();
 
 
         //Double runningProbabilityTotalForTHisTag
-        Double runningProbabilityTotalForThisTag = null;
+        Double runningProbabilityTotalForThisTag = 0.0;
         //for each movie in the recommendations list
         for (Result movie: recommendations) {
 
@@ -77,21 +77,21 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
                 runningProbabilityTotalForThisTag = 0.0;
 
                 //if the tag is in the list for tag probailities,
-                if( tagProbabilities.containsKey(tag) ) {
+                if( tagProbabilitiesList.containsKey(tag) ) {
 
                     //runningProbabilityTotalForTHisTag = the stored probablity  for this tag
-                    runningProbabilityTotalForThisTag = tagProbabilities.get(tag);
+                    runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tag);
                 }
                 //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
                 runningProbabilityTotalForThisTag += ((1/recommendations.size()) * (1/movieTagList.size() ) );
 
                 //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
-                tagProbabilities.put(tag, runningProbabilityTotalForThisTag);
+            tagProbabilitiesList.put(tag, runningProbabilityTotalForThisTag);
 
         }
 
         //for each tag in the list for tag probabilities
-        for (Long tag: tagProbabilities.keySet()) {
+        for (Long tag: tagProbabilitiesList.keySet()) {
             //runningProbabilityTotalForTHisTag = the stored probablity for this tag
             runningProbabilityTotalForThisTag = tagProbabilities.get(tag);
 
