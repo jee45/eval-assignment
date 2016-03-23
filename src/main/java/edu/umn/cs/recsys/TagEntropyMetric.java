@@ -2,6 +2,7 @@ package edu.umn.cs.recsys;
 
 import com.google.common.collect.Sets;
 import edu.umn.cs.recsys.dao.ItemTagDAO;
+import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import org.lenskit.LenskitRecommender;
 import org.lenskit.api.Recommender;
@@ -61,12 +62,13 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
 
         //for each movie in the recommendations list
-            //get the list of tags for this move
+        for (Result movie: recommendations) {
+
             //for each tag in the tag list
                 //count and add some stuff
 
 
-
+        }
 
 
         context.addUser(entropy);
