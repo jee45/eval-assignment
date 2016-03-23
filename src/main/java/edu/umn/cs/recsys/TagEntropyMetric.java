@@ -59,31 +59,51 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
         // TODO Implement the entropy metric
 
         // record the entropy in the context for aggregation
+
         //make a list for tag probabilities
+        Long2DoubleMap tagProbabilities = null;
 
 
-        //runningProbabilityTotalForTHisTag
-
+        //Double runningProbabilityTotalForTHisTag
+        Double runningProbabilityTotalForThisTag = null;
         //for each movie in the recommendations list
         for (Result movie: recommendations) {
 
-            //runningProbabilityTotalForTHisTag = 0
-
             //get the list of tags for this movie
+            Long2DoubleMap movieTagList = (Long2DoubleMap) tagDAO.getItemTags(movie.getId());
 
              //for each tag in the tag list
+            for (Long tag: movieTagList.keySet())
+                runningProbabilityTotalForThisTag = 0.0;
 
                 //if the tag is in the list for tag probailities,
-                    //runningProbabilityTotalForTHisTag = the stored probablity  for this tag
+                if( tagProbabilities.containsKey(tag) ) {
 
+                    //runningProbabilityTotalForTHisTag = the stored probablity  for this tag
+                    runningProbabilityTotalForThisTag = tagProbabilities.get(tag);
+                }
                 //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
+                runningProbabilityTotalForThisTag += ((1/recommendations.size()) * (1/movieTagList.size() ) );
+
                 //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
+                tagProbabilities.put(tag, runningProbabilityTotalForThisTag);
 
         }
 
         //for each tag in the list for tag probabilities
+        for (Long tag: tagProbabilities.keySet()) {
             //runningProbabilityTotalForTHisTag = the stored probablity for this tag
-            //entropy += (runningProbabilityTotalForTHisTag)* log(runningProbabilityTotalForTHisTag)
+            runningProbabilityTotalForThisTag = tagProbabilities.get(tag);
+
+            //entropy -= (runningProbabilityTotalForTHisTag)* log(runningProbabilityTotalForTHisTag)
+            entropy -= (runningProbabilityTotalForThisTag)* Math.log(runningProbabilityTotalForThisTag);
+
+
+        }
+
+
+
+
 
         context.addUser(entropy);
 
