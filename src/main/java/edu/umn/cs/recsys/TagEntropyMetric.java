@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,34 +71,39 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
         for (Result movie: recommendations) {
 
             //get the list of tags for this movie
-            Long2DoubleMap movieTagList = (Long2DoubleMap) tagDAO.getItemTags(movie.getId());
+            List<String> movieTagList = tagDAO.getItemTags(movie.getId());
+
+
 
             //for each tag in the tag list
-            for (Long tag : movieTagList.keySet()) {
+            for (String tag : movieTagList) {
+                Long tagId = vocab.getTagId(tag);
 
                 runningProbabilityTotalForThisTag = 0.0;
 
+
+
                 //if the tag is in the list for tag probailities,
-                if (tagProbabilitiesList.containsKey(tag)) {
+                if (tagProbabilitiesList.containsKey(tagId)) {
 
                     //runningProbabilityTotalForTHisTag = the stored probablity  for this tag
-                    runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tag);
+                    runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
                 }
 
                 //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
                 runningProbabilityTotalForThisTag += ((1 / recommendations.size()) * (1 / movieTagList.size()));
 
                 //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
-                tagProbabilitiesList.put(tag, runningProbabilityTotalForThisTag);
+                tagProbabilitiesList.put(tagId, runningProbabilityTotalForThisTag);
             }
 
         }
 
 
         //for each tag in the list for tag probabilities
-        for (Long tag: tagProbabilitiesList.keySet()) {
+        for (Long tagId: tagProbabilitiesList.keySet()) {
             //runningProbabilityTotalForTHisTag = the stored probablity for this tag
-            runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tag);
+            runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
 
             //entropy -= (runningProbabilityTotalForTHisTag)* log(runningProbabilityTotalForTHisTag)
             entropy -= (runningProbabilityTotalForThisTag)* Math.log(runningProbabilityTotalForThisTag);
