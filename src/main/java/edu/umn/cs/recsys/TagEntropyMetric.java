@@ -58,6 +58,17 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
         // TODO Implement the entropy metric
 
         // record the entropy in the context for aggregation
+
+
+        //for each movie in the recommendations list
+            //get the list of tags for this move
+            //for each tag in the tag list
+                //count and add some stuff
+
+
+
+
+
         context.addUser(entropy);
 
         return new TagEntropyResult(entropy);
