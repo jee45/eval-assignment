@@ -105,8 +105,8 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
             //runningProbabilityTotalForTHisTag = the stored probablity for this tag
             runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
 
-            //entropy -= (runningProbabilityTotalForTHisTag)* log(runningProbabilityTotalForTHisTag)
-            entropy -= (runningProbabilityTotalForThisTag)* Math.log(runningProbabilityTotalForThisTag);
+            //entropy -= (runningProbabilityTotalForTHisTag)* logBase2(runningProbabilityTotalForTHisTag)
+            entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag)/(Math.log(2)));
 
 
         }
