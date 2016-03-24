@@ -48,11 +48,15 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
     public MetricResult measureUser(TestUser user, ResultList recommendations, Context context) {
         int n = recommendations.size();
 
+        System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>>  size of rec " + recommendations.size());
 
         if (recommendations == null || recommendations.isEmpty()) {
             return MetricResult.empty();
             // no results for this user.
         }
+
+
+
         // get tag data from the context so we can use it
         ItemTagDAO tagDAO = context.getItemTagDAO();
         TagVocabulary vocab = context.getTagVocabulary();
@@ -69,16 +73,24 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
         //Double runningProbabilityTotalForTHisTag
         Double runningProbabilityTotalForThisTag = 0.0;
+
         //for each movie in the recommendations list
         for (Result movie: recommendations) {
 
-            //get the list of tags for this movie
-            List<String> movieTagList = tagDAO.getItemTags(movie.getId());
+            System.out.println(" ++++ ---- ++++ ---- ++++ movie id " + movie.getId());
 
+            Long iid=  movie.getId();
+
+            //get the list of tags for this movie
+            //List<String> tagListForThisMovie = tagDAO.getItemTags(movie.getId());
+            List<String> tagListForThisMovie = tagDAO.getItemTags(iid);
+
+
+            System.out.println(" ++++----++++----++++---- size of taglist " + tagListForThisMovie.size());
             List<String> tagsAlreadySeenInThisMovie =  new ArrayList<String>();
 
             //for each tag in the tag list
-            for (String tag : movieTagList) {
+            for (String tag : tagListForThisMovie) {
                 //ignore frequency.
                 //if we have not seen this tag for this movie before,
                 if(!tagsAlreadySeenInThisMovie.contains(tag)) {
@@ -86,9 +98,7 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
                     //it has now been seen
                     tagsAlreadySeenInThisMovie.add(tag);
 
-
                     Long tagId = vocab.getTagId(tag);
-
                     runningProbabilityTotalForThisTag = 0.0;
 
 
@@ -100,11 +110,11 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
                     }
 
                     //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
-                    runningProbabilityTotalForThisTag += ((1 / recommendations.size()) * (1 / movieTagList.size()));
+                    runningProbabilityTotalForThisTag += ((1 / recommendations.size()) * (1 / tagListForThisMovie.size()));
 
                     //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
                     tagProbabilitiesList.put(tagId, runningProbabilityTotalForThisTag);
-
+                    System.out.println("size of list "+tagProbabilitiesList.size());
                 }
             }
 
@@ -116,7 +126,11 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
             //runningProbabilityTotalForTHisTag = the stored probablity for this tag
             runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
 
+            System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>> " + runningProbabilityTotalForThisTag);
+
             //entropy -= (runningProbabilityTotalForTHisTag)* logBase2(runningProbabilityTotalForTHisTag)
+            //entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag));
+
             entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag)/(Math.log(2)));
 
 
@@ -125,7 +139,7 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
 
 
-
+        System.out.println(" .... .... .... .... .... .... .... .... " + entropy);
         context.addUser(entropy);
 
         return new TagEntropyResult(entropy);
