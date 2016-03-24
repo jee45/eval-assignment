@@ -71,14 +71,14 @@ public class TagEntropyMetricTest {
         assertThat(ctx, not(nullValue()));
 
 
-        // movie 165 has 10 tags
+        // movie 812 has 50 tags
         TestUser tu = createUser(42);
-        ResultList recs = createRecommendations(165);
+        ResultList recs = createRecommendations(812);
 
         TagEntropyMetric.TagEntropyResult result = (TagEntropyMetric.TagEntropyResult) metric.measureUser(tu, recs, ctx);
         assertThat(result, not(nullValue()));
 
-        double expected = movieTagEntropy(10);
+        double expected = movieTagEntropy(50);
 
         assertThat(result.entropy, closeTo(expected, 0.0001));
 
@@ -96,27 +96,27 @@ public class TagEntropyMetricTest {
         TagEntropyMetric.Context ctx = metric.createContext(null, null, recommender);
         assertThat(ctx, not(nullValue()));
 
-        // movie 165 has 10 tags
+        // movie 812 has 50 tags
         TestUser tu = createUser(42);
-        ResultList recs = createRecommendations(165);
+        ResultList recs = createRecommendations(812);
 
         TagEntropyMetric.TagEntropyResult result = (TagEntropyMetric.TagEntropyResult) metric.measureUser(tu, recs, ctx);
         assertThat(result, not(nullValue()));
-        assertThat(result.entropy, closeTo(movieTagEntropy(10), 0.0001));
+        assertThat(result.entropy, closeTo(movieTagEntropy(50), 0.0001));
 
-        // movie 318 has 15 tags
+        // movie 664 has 40 tags
         tu = createUser(39);
-        recs = createRecommendations(318);
+        recs = createRecommendations(664);
 
         result =  (TagEntropyMetric.TagEntropyResult) metric.measureUser(tu, recs, ctx);
         assertThat(result, not(nullValue()));
-        assertThat(result.entropy, closeTo(movieTagEntropy(15), 0.0001));
+        assertThat(result.entropy, closeTo(movieTagEntropy(40), 0.0001));
 
         TagEntropyMetric.TagEntropyResult aggResult = (TagEntropyMetric.TagEntropyResult) metric.getAggregateMeasurements(ctx);
         assertThat(aggResult, not(nullValue()));
         // average of 1 user's entropy is that entropy
         assertThat(aggResult.entropy,
-                   closeTo((movieTagEntropy(10) + movieTagEntropy(15)) / 2, 0.0001));
+                closeTo((movieTagEntropy(50) + movieTagEntropy(40)) / 2, 0.0001));
     }
 
     /**
@@ -127,12 +127,12 @@ public class TagEntropyMetricTest {
         TagEntropyMetric.Context ctx = metric.createContext(null, null, recommender);
         assertThat(ctx, not(nullValue()));
 
-        // movie 165 has 10 tags
-        // movie 318 has 15 tags
+        // movie 812 has 50 tags
+        // movie 664 has 40 tags
         TestUser tu = createUser(42);
-        ResultList recs = createRecommendations(165, 318);
+        ResultList recs = createRecommendations(812, 664);
 
-        double expected = 4.5334967967;
+        double expected = 6.415995;
         TagEntropyMetric.TagEntropyResult result =  (TagEntropyMetric.TagEntropyResult) metric.measureUser(tu, recs, ctx);
         assertThat(result, not(nullValue()));
         assertThat(result.entropy, closeTo(expected, 0.0001));
@@ -141,7 +141,7 @@ public class TagEntropyMetricTest {
         assertThat(aggResult, not(nullValue()));
         // average of 1 user's entropy is that entropy
         assertThat(aggResult.entropy,
-                   closeTo(expected, 0.0001));
+                closeTo(expected, 0.0001));
     }
 
     private double movieTagEntropy(int ntags) {

@@ -21,11 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
@@ -79,43 +75,47 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
             System.out.println(" ++++ ---- ++++ ---- ++++ movie id " + movie.getId());
 
-            Long iid=  movie.getId();
-
             //get the list of tags for this movie
             //List<String> tagListForThisMovie = tagDAO.getItemTags(movie.getId());
-            List<String> tagListForThisMovie = tagDAO.getItemTags(iid);
+            List<String> tagListForThisMovie = tagDAO.getItemTags(movie.getId());
 
+            Set<String> tagSetForThisMovie = new HashSet<>(tagListForThisMovie);
 
-            System.out.println(" ++++----++++----++++---- size of taglist " + tagListForThisMovie.size());
-            List<String> tagsAlreadySeenInThisMovie =  new ArrayList<String>();
+            System.out.println(" ++++----++++----++++---- size of taglist " + tagSetForThisMovie.size());
+            //List<String> tagsAlreadySeenInThisMovie =  new ArrayList<String>();
 
             //for each tag in the tag list
-            for (String tag : tagListForThisMovie) {
+            for (String tag : tagSetForThisMovie) {
                 //ignore frequency.
                 //if we have not seen this tag for this movie before,
-                if(!tagsAlreadySeenInThisMovie.contains(tag)) {
+                //if(!tagsAlreadySeenInThisMovie.contains(tag)) {
 
-                    //it has now been seen
-                    tagsAlreadySeenInThisMovie.add(tag);
+                //it has now been seen
+                //tagsAlreadySeenInThisMovie.add(tag);
 
-                    Long tagId = vocab.getTagId(tag);
-                    runningProbabilityTotalForThisTag = 0.0;
+                Long tagId = vocab.getTagId(tag);
+                runningProbabilityTotalForThisTag = 0.0;
 
 
-                    //if the tag is in the list for tag probailities,
-                    if (tagProbabilitiesList.containsKey(tagId)) {
+                //if the tag is in the list for tag probailities,
+                if (tagProbabilitiesList.containsKey(tagId)) {
 
-                        //runningProbabilityTotalForTHisTag = the stored probablity  for this tag
-                        runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
-                    }
-
-                    //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
-                    runningProbabilityTotalForThisTag += ((1 / recommendations.size()) * (1 / tagListForThisMovie.size()));
-
-                    //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
-                    tagProbabilitiesList.put(tagId, runningProbabilityTotalForThisTag);
-                    System.out.println("size of list "+tagProbabilitiesList.size());
+                    //runningProbabilityTotalForTHisTag = the stored probablity  for this tag
+                    runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
                 }
+
+                //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
+                runningProbabilityTotalForThisTag += ((1.0 / recommendations.size()) * (1.0 / tagListForThisMovie.size()));
+
+
+                //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
+                tagProbabilitiesList.put(tagId, runningProbabilityTotalForThisTag);
+
+                System.out.println("size of probabiltiy list "+ tagProbabilitiesList.size());
+                System.out.println(".... value of probabiltiy should be:  " + runningProbabilityTotalForThisTag);
+                System.out.println(".... value of probabiltiy is " + tagProbabilitiesList.get(tagId));
+                System.out.println("");
+                //}
             }
 
         }
@@ -124,14 +124,16 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
         //for each tag in the list for tag probabilities
         for (Long tagId: tagProbabilitiesList.keySet()) {
             //runningProbabilityTotalForTHisTag = the stored probablity for this tag
+
             runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
 
-            System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>> " + runningProbabilityTotalForThisTag);
+            System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>> prob stored for this tag" + runningProbabilityTotalForThisTag);
 
             //entropy -= (runningProbabilityTotalForTHisTag)* logBase2(runningProbabilityTotalForTHisTag)
-            //entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag));
+            entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag));
 
-            entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag)/(Math.log(2)));
+            //entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag)/(Math.log(2)));
+            System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>> ++++ ---- ++++ ---- ++++ ---- >>>> entropy     " + entropy);
 
 
         }
