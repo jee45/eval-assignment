@@ -83,6 +83,7 @@ task evaluate(type: TrainTest, group: 'evaluate') {
 
     // configure our algorithms
     algorithm 'cfg/baselines.groovy'
+    algorithm 'cfg/user-user.groovy'
 
     // and some evaluation tasks and metrics
     predict {

@@ -21,7 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -72,7 +74,8 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
             //get the list of tags for this movie
             List<String> movieTagList = tagDAO.getItemTags(movie.getId());
-            List <String> tagsAlreadySeenInThisMovie = new List();
+
+            List<String> tagsAlreadySeenInThisMovie =  new ArrayList<String>();
 
             //for each tag in the tag list
             for (String tag : movieTagList) {
