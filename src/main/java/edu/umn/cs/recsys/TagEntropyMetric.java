@@ -72,29 +72,37 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
             //get the list of tags for this movie
             List<String> movieTagList = tagDAO.getItemTags(movie.getId());
-
-
+            List <String> tagsAlreadySeenInThisMovie = new List();
 
             //for each tag in the tag list
             for (String tag : movieTagList) {
-                Long tagId = vocab.getTagId(tag);
+                //ignore frequency.
+                //if we have not seen this tag for this movie before,
+                if(!tagsAlreadySeenInThisMovie.contains(tag)) {
 
-                runningProbabilityTotalForThisTag = 0.0;
+                    //it has now been seen
+                    tagsAlreadySeenInThisMovie.add(tag);
 
 
+                    Long tagId = vocab.getTagId(tag);
 
-                //if the tag is in the list for tag probailities,
-                if (tagProbabilitiesList.containsKey(tagId)) {
+                    runningProbabilityTotalForThisTag = 0.0;
 
-                    //runningProbabilityTotalForTHisTag = the stored probablity  for this tag
-                    runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
+
+                    //if the tag is in the list for tag probailities,
+                    if (tagProbabilitiesList.containsKey(tagId)) {
+
+                        //runningProbabilityTotalForTHisTag = the stored probablity  for this tag
+                        runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
+                    }
+
+                    //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
+                    runningProbabilityTotalForThisTag += ((1 / recommendations.size()) * (1 / movieTagList.size()));
+
+                    //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
+                    tagProbabilitiesList.put(tagId, runningProbabilityTotalForThisTag);
+
                 }
-
-                //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
-                runningProbabilityTotalForThisTag += ((1 / recommendations.size()) * (1 / movieTagList.size()));
-
-                //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
-                tagProbabilitiesList.put(tagId, runningProbabilityTotalForThisTag);
             }
 
         }
