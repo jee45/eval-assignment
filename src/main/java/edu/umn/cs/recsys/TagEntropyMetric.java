@@ -104,8 +104,11 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
                     runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
                 }
 
+                System.out.println("**** ****  value of probabiltiy should be:  " + runningProbabilityTotalForThisTag);
+
                 //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
-                runningProbabilityTotalForThisTag += ((1.0 / recommendations.size()) * (1.0 / tagListForThisMovie.size()));
+                runningProbabilityTotalForThisTag += ((1.0 / recommendations.size()) * (1.0 / tagSetForThisMovie.size()));
+                System.out.println("**** ****  value of probabiltiy should be:  " + runningProbabilityTotalForThisTag);
 
 
                 //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
@@ -130,9 +133,9 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
             System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>> prob stored for this tag" + runningProbabilityTotalForThisTag);
 
             //entropy -= (runningProbabilityTotalForTHisTag)* logBase2(runningProbabilityTotalForTHisTag)
-            entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag));
+            //entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag));
 
-            //entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag)/(Math.log(2)));
+            entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag)/(Math.log(2)));
             System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>> ++++ ---- ++++ ---- ++++ ---- >>>> entropy     " + entropy);
 
 
