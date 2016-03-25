@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import edu.umn.cs.recsys.dao.ItemTagDAO;
 import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
+
 import org.lenskit.LenskitRecommender;
 import org.lenskit.api.Recommender;
 import org.lenskit.api.Result;
@@ -15,6 +16,7 @@ import org.lenskit.eval.traintest.metrics.MetricColumn;
 import org.lenskit.eval.traintest.metrics.MetricResult;
 import org.lenskit.eval.traintest.metrics.TypedMetricResult;
 import org.lenskit.eval.traintest.recommend.TopNMetric;
+
 import org.lenskit.util.math.Vectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,6 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
     public MetricResult measureUser(TestUser user, ResultList recommendations, Context context) {
         int n = recommendations.size();
 
-        System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>>  size of rec " + recommendations.size());
 
         if (recommendations == null || recommendations.isEmpty()) {
             return MetricResult.empty();
@@ -73,15 +74,12 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
         //for each movie in the recommendations list
         for (Result movie: recommendations) {
 
-            System.out.println(" ++++ ---- ++++ ---- ++++ movie id " + movie.getId());
 
             //get the list of tags for this movie
             //List<String> tagListForThisMovie = tagDAO.getItemTags(movie.getId());
             List<String> tagListForThisMovie = tagDAO.getItemTags(movie.getId());
 
             Set<String> tagSetForThisMovie = new HashSet<>(tagListForThisMovie);
-
-            System.out.println(" ++++----++++----++++---- size of taglist " + tagSetForThisMovie.size());
             //List<String> tagsAlreadySeenInThisMovie =  new ArrayList<String>();
 
             //for each tag in the tag list
@@ -104,25 +102,19 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
                     runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
                 }
 
-                System.out.println("**** ****  value of probabiltiy should be:  " + runningProbabilityTotalForThisTag);
-
                 //add to runningProbabilityTotalForTHisTag ((1/movieCountInRecomndationList)(1/totalTagCountForThisMovie)) //////// is this right?
                 runningProbabilityTotalForThisTag += ((1.0 / recommendations.size()) * (1.0 / tagSetForThisMovie.size()));
-                System.out.println("**** ****  value of probabiltiy should be:  " + runningProbabilityTotalForThisTag);
+
 
 
                 //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
                 tagProbabilitiesList.put(tagId, runningProbabilityTotalForThisTag);
 
-                System.out.println("size of probabiltiy list "+ tagProbabilitiesList.size());
-                System.out.println(".... value of probabiltiy should be:  " + runningProbabilityTotalForThisTag);
-                System.out.println(".... value of probabiltiy is " + tagProbabilitiesList.get(tagId));
-                System.out.println("");
+
                 //}
             }
 
         }
-
 
         //for each tag in the list for tag probabilities
         for (Long tagId: tagProbabilitiesList.keySet()) {
@@ -130,21 +122,17 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
             runningProbabilityTotalForThisTag = tagProbabilitiesList.get(tagId);
 
-            System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>> prob stored for this tag" + runningProbabilityTotalForThisTag);
 
             //entropy -= (runningProbabilityTotalForTHisTag)* logBase2(runningProbabilityTotalForTHisTag)
             //entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag));
 
             entropy -= (runningProbabilityTotalForThisTag)* (Math.log(runningProbabilityTotalForThisTag)/(Math.log(2)));
-            System.out.println(" ++++ ---- ++++ ---- ++++ ---- >>>> ++++ ---- ++++ ---- ++++ ---- >>>> entropy     " + entropy);
 
 
         }
 
 
 
-
-        System.out.println(" .... .... .... .... .... .... .... .... " + entropy);
         context.addUser(entropy);
 
         return new TagEntropyResult(entropy);

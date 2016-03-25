@@ -1,6 +1,13 @@
+import org.lenskit.knn.user.UserUserItemScorer;
+import org.lenskit.knn.NeighborhoodSize;
+import org.grouplens.lenskit.vectors.similarity.VectorSimilarity;
+import org.grouplens.lenskit.vectors.similarity.PearsonCorrelation;
+import org.grouplens.lenskit.transform.normalize.VectorNormalizer;
+import org.grouplens.lenskit.transform.normalize.MeanCenteringVectorNormalizer;
+
 
 for (nnbrs in [5, 10, 15, 20, 25, 30, 40, 50, 75, 100]) {
-    algorithm("UserUser") {
+     algorithm("UserUser") {
         include 'tag-setup.groovy'
         include 'fallback.groovy'
         // Attributes let you specify additional properties of the algorithm.
