@@ -54,6 +54,8 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
 
 
+
+
         // get tag data from the context so we can use it
         ItemTagDAO tagDAO = context.getItemTagDAO();
         TagVocabulary vocab = context.getTagVocabulary();
@@ -109,6 +111,7 @@ public class TagEntropyMetric extends TopNMetric<TagEntropyMetric.Context> {
 
                 //store the  new runningProbabilityTotalForTHisTag in the list for tag probabilities
                 tagProbabilitiesList.put(tagId, runningProbabilityTotalForThisTag);
+
 
 
                 //}
